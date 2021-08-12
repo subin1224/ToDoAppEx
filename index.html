@@ -1,1 +1,72 @@
-<!-- Test Commit* -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TodoApp</title>
+    <link rel="stylesheet" href="todo-css/todo.css">
+</head>
+<body>
+    <header class="header">
+        <h1>todos</h1>
+    </header>
+
+    <section class="todo">
+        <header class="todo-head">
+            <input type="checkbox" class="allChk" id="allChk">
+            <label for="allChk"></label>
+            <input type="text" class="new-todo" placeholder="What needs to be done?" autofocus/>
+        </header>
+        <section class="todo-main">
+            <ul class="todo-list">
+                <li>
+                    <div class="task">
+                        <input type="checkbox" class="chk">
+                        <label>task1</label>
+                        <button class="del"></button>
+                    </div>
+                </li>
+                <li>
+                    <div class="task">
+                        <input type="checkbox" class="chk">
+                        <label>task2</label>
+                        <button class="del"></button>
+                    </div>
+                </li>
+                <li>
+                    <div class="task">
+                        <input type="checkbox" class="chk">
+                        <label>task3</label>
+                        <button class="del"></button>
+                    </div>
+                </li>
+            </ul>
+            
+            <footer class="todo-foot">
+                <span class="todo-count">(number) items left</span>
+                <ul class="filters">
+                    <li>
+                        <a href="#">All</a>
+                    </li>
+                    <li>
+                        <a href="#">Active</a>
+                    </li>
+                    <li>
+                        <a href="#">Completed</a>
+                    </li>
+                </ul>
+                <button class="clear-completed">Clear completed</button>
+            </footer>
+        </section>
+    </section>
+
+    <footer class="footer">
+        <p>Double-click to edit a todo</p>
+        <p>Exem OJT 4week Subin Lee</p>
+        <p>Make todoApp</p>
+        <p><a href="https://github.com/subin1224/ToDoAppEx">Subin's Github</a></p>
+    </footer>
+
+</body>
+</html>
