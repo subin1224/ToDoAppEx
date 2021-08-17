@@ -5,113 +5,191 @@ delete 할때 좀 문제가 생길것 같고 ..
 어떤것이 Active / complete 되었는지도 상태도 있어야 하고..
 => 객체 저장
 */
-
 //로컬 스토리지에 있는 todo들 혹은 맨 처음의 빈 배열
-const list =JSON.parse(localStorage.getItem('list')) || [];
+let list =JSON.parse(localStorage.getItem('list')) || [];
 const insert = document.querySelector('.new-todo');
 const todoList = document.querySelector('.todo-list');
+const todoMain = document.querySelector('.todo-main');
+const todoFoot = document.querySelector('.todo-foot');
+const filters = document.querySelector('.filters');
 
-showList(list, todoList);
+const clearCompleted = todoFoot.querySelector('.clear-completed');
+const allChk = document.querySelector('.allChk');
+
+showList(list, todoList, localStorage.getItem('state'));
 
 //Create
-//기존 todoApp에서는 Alt나 Tab 눌러도 등록 되었으나 Enter만 등록되게 수정
-//기존 todoApp은 focusOut(?) 이용 했을거라 추측 .....
-insert.addEventListener("keyup", (e)=>{
-    if(e.key === "Enter" && insert.value.length > 0){
+function insertEvent(e){
+    if(insert.value.length > 0){
         const task = insert.value;
         const item = {
-            task,
-            done : false
+            id : new Date().getTime(),
+            done : false,
+            task
         };
         list.push(item);
-        showList(list, todoList);
         localStorage.setItem('list',JSON.stringify(list));
+        showList(list, todoList, localStorage.getItem('state'));
 
         insert.value="";
         insert.focus();
     }
+}
+
+//Q. 원래 todoApp에서는 Alt Enter나 Ctrl Enter 누르면 안됐는데
+// 그럼 처리를 어떻게 해준걸까 TT
+insert.addEventListener('blur',insertEvent);
+insert.addEventListener('keyup', (e)=>{
+    if(e.keyCode === 13) insertEvent(this);
 });
 
-//innerHTML 보단 textContent 권장사항인데, 각종 요소들이 필요해서
-//createElement 작성해서 textNode로 작성을 하였는데
-//이와 같이 요소들이 많은 경우에는 createElement 보다는 innerHTML이 더 낫다고..
-//이와 관련된 부분 학습해서 수정 혹은 보완
-function addList(task){
-    const li = document.createElement('li');
-
-    const div = document.createElement('div');
-    div.setAttribute('class','task');
-
-    li.appendChild(div);
-
-    const input = document.createElement('input');
-    input.setAttribute('type', 'checkbox');
-    input.setAttribute('class','chk');
-
-    const label = document.createElement('label');
-
-    const btn = document.createElement('button');
-    btn.setAttribute('class', 'del');
-
-    const item = document.createTextNode(task);
-    label.appendChild(item);
-
-    div.append(input, label, btn);
-
-    todoList.appendChild(li);
-}
-
-
 //Read
+function selectState(state){
+    const liA = filters.querySelectorAll('li a');
+    
+    for(const a of liA){
+        if(state == a.innerText){
+            a.className = 'selected';
+        }else{
+            a.className = '';
+        }
+    }
+}
+
+
 //로컬스토리지 학습 -> list.length >0 이면 todo-foot 나오게 변경
-function showList(list = [], todoList){
-    todoList.innerHTML = list.map((item, i) => {
-        return `
-        <li class="${item.done ? 'completed' : ''}">
-            <div class="task">
-                <input type="checkbox" class="chk" data-index=${i} id="item${i}" 
-                    ${item.done ? 'checked' : ''} />
-                <label >${item.task}</label>
-                <button class="del"></button>
-            </div>
-        </li>
-        `;
-    }).join(''); //join 쓰는 이유?
+//map() 활용
+function showList(list = [], todoList, state){
+    if(list.length > 0){
+        todoMain.style.display = 'block';
+
+        let arr;
+        if(state == 'Active') arr = list.filter((item) => !item.done);
+        else if(state == 'Completed') arr = list.filter((item) => item.done);
+        else arr = list;
+
+        todoList.innerHTML = arr.map((item, i) => {
+            return `
+            <li class="${item.done ? 'completed' : ''}">
+                <div class="task">
+                    <input type="checkbox" class="chk" data-index=${i} 
+                        ${item.done ? 'checked' : ''} />
+                    <label>${item.task}</label>
+                    <button class="del"></button>
+                </div>
+            </li>
+            `;
+        }).join(''); //join을 안쓰면 빈 공백이 생김
+
+        //목록 중 체크가 하나라도 풀리면 전체 체크박스 자동 해제, 
+        //모든 목록이 다 체크 되었으면 전체 체크 박스 설정
+        let chkLen = 0;
+        for(const item of list){
+            if(item.done) chkLen++;
+        }
+
+        if(chkLen == list.length) allChk.checked = true;
+        else allChk.checked = false;
+
+        const todoCnt = todoFoot.querySelector('.todo-count');
+        todoCnt.textContent = `${list.length - chkLen} items left`;
+
+        if(chkLen > 0) clearCompleted.style.display = 'block';
+        else clearCompleted.style.display = 'none';
+
+        selectState(localStorage.getItem('state'));
+    }else{
+        todoMain.style.display = 'none';
+    }
+    
 }
 
 
-
-
-//Update
-//dbClick 메서드 만들어야 함
-
-//체크박스에 이벤트
-//왜 요소 첫번째만 반영이 되는거지 ... ㅠㅠ
-/*
-querySelectorAll, for...of 학습!  => addEventListenr 로 해결
-const chk = document.querySelectorAll('.chk');
-for(const updateChk of chk){
-    updateChk.addEventListener('click', (e)=>{
-        const el = e.target;
-        const idx = el.dataset.index;
-        list[idx].done = !list[idx].done;
-        localStorage.setItem('items', JSON.stringify(list));
-        showList(list, todoList);
-    });
-}
-*/
-
-function chkEvent(e){
-    if(!e.target.matches('input')) return;
+//Update, Delete 
+function clickEvent(e){   //체크랑 삭제(Delete 기능)
     const el = e.target;
-    const idx = el.dataset.index;
-    list[idx].done = !list[idx].done;
-    localStorage.setItem('list', JSON.stringify(list));
-    showList(list, todoList);
+    
+    let arr;
+    let state = localStorage.getItem('state');
+    if(state == 'Active') arr = list.filter((item) => !item.done);
+    else if(state == 'Completed') arr = list.filter((item) => item.done);
+    else arr = list;
+
+    if(el.matches('.chk')){ //chk
+        const idx = el.dataset.index;
+        arr[idx].done = !arr[idx].done;
+        
+    }else if(el.matches('button')){ //del
+        const idx = el.parentNode.querySelector('.chk').dataset.index;  // Q. 
+        arr.splice(idx, 1);
+    }
+    localStorage.setItem('list', JSON.stringify(arr));
+    showList(list, todoList, state);
 }
 
-todoList.addEventListener('click', chkEvent);
+//update ************************************************Edit
+//=> 더블클릭하면 => input type text가 보여짐
+function dblclickEvent(e){
+    const el = e.target;
+    const li = todoList.querySelector('li');
+    const input = document.createElement("input");
+    input.setAttribute('class','edit');
 
+    if(el.matches('label')){
+        console.log('label');
+    }
+}
 
-//Delete
+todoList.addEventListener('click', clickEvent);
+todoList.addEventListener('dblclick', dblclickEvent);
 
+//체크박스
+//전체 체크박스 => 체크상태 라면 done이 true, 체크를 푼다면 done이 false
+function allChkEvent(e){
+    const el = e.target;
+    if(el.checked){
+        for(const item of list){
+            item.done = true;
+        }
+    }else{
+        for(const item of list){
+            item.done = false;
+        }
+    }
+    localStorage.setItem('list', JSON.stringify(list));
+    showList(list, todoList, localStorage.getItem('state'));
+}
+
+allChk.addEventListener('click', allChkEvent);
+
+//filters
+function filterEvent(e){
+    const el = e.target;
+    //filters 안의 li 의 a태그들의 class 삭제
+    const liA = this.querySelectorAll('li a');
+    for(const a of liA){
+        a.classList.remove('selected');
+    }
+    el.className = 'selected';
+    
+    if(el.textContent == 'Active'){
+        localStorage.setItem('state','Active');
+    }else if(el.textContent == 'Completed'){
+        localStorage.setItem('state','Completed');
+    }else{
+        localStorage.setItem('state','All');
+    }
+    showList(list, todoList, localStorage.getItem('state'));
+}
+
+filters.addEventListener('click', filterEvent);
+
+//clearCompleted  Q.....
+function clearEvent(e){
+    list = list.filter((item) => !item.done); //
+    localStorage.removeItem('list');
+    localStorage.setItem('list',JSON.stringify(list));
+    showList(list, todoList, localStorage.getItem('state'));
+}
+
+clearCompleted.addEventListener('click', clearEvent);

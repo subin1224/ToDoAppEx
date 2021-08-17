@@ -13,28 +13,28 @@
 
     <section class="todo">
         <header class="todo-head">
-            <input type="checkbox" class="allChk" id="allChk">
-            <label for="allChk"></label>
             <input type="text" class="new-todo" placeholder="What needs to be done?" autofocus/>
         </header>
-        <section class="todo-main">
+        <section class="todo-main" style="display:none">
+            <input type="checkbox" class="allChk" id="allChk">
+            <label for="allChk"></label>
+            
             <ul class="todo-list"></ul>
             
             <footer class="todo-foot">
-                <span class="todo-count">(number) items left</span>
-                <!-- 화면을 줄여도 ul의 li끼리 서로 안겹치게 수정해야함-->
+                <span class="todo-count"></span>
                 <ul class="filters">
                     <li>
-                        <a href="#">All</a>
+                        <a href="#/" class="selected">All</a>
                     </li>
                     <li>
-                        <a href="#">Active</a>
+                        <a href="#/active">Active</a>
                     </li>
                     <li>
-                        <a href="#">Completed</a>
+                        <a href="#/completed">Completed</a>
                     </li>
                 </ul>
-                <button class="clear-completed">Clear completed</button>
+                <button class="clear-completed" style="display:none">Clear completed</button>
             </footer>
         </section>
     </section>
