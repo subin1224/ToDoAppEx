@@ -62,6 +62,9 @@
     - 로컬스토리지를 이용하여 create, 체크박스로 상태 변경, read 작업 완료
 - 0.0.3
     - 로컬스토리지에 state 추가, read 변경, insert-Event 추가, filter 기능 추가
+- 0.0.4
+    - update 기능 및 filter 를 적용 한 채로 CRUD 작업 완 (모든 기능 구현 완료)
+    - 코드를 좀 더 깔끔하게 다듬는 작업 (1)
 ---
 <br>
 <br>
