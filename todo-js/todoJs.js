@@ -28,7 +28,6 @@ const insertEvent = (e) => {
 }
 
 //Q. 원래 todoApp에서는 Alt Enter나 Ctrl Enter 누르면 안됐는데
-// 그럼 처리를 어떻게 해준걸까 TT
 insert.addEventListener('blur',insertEvent);
 insert.addEventListener('keyup', (e)=>{
     if(e.keyCode === 13) insertEvent(this);
