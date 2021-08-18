@@ -9,7 +9,7 @@ const todoFoot = document.querySelector('.todo-foot');
 
 const filters = document.querySelector('.filters');
 
-//Create
+//Create --
 const insertEvent = (e) => {
     if(insert.value.length > 0){
         const task = insert.value;
