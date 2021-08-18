@@ -331,8 +331,8 @@ html .clear-completed:active {
 .footer a:hover{
     text-decoration: underline;
 }
-
-media screen and (-webkit-min-device-pixel-ratio:0) {
+/* */
+@media screen and (-webkit-min-device-pixel-ratio:0) {
 	.toggle-all,
 	.todo-list li .toggle {
 		background: none;
