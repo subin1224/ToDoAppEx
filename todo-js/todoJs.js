@@ -1,7 +1,7 @@
 //로컬 스토리지에 있는 todo들 혹은 맨 처음의 빈 배열
 let list = JSON.parse(localStorage.getItem('list')) || [];
 
-const insert = document.querySelector('.new-todo');
+const insertInput = document.querySelector('.new-todo');
 
 const todoList = document.querySelector('.todo-list');
 const todoMain = document.querySelector('.todo-main');
@@ -9,10 +9,11 @@ const todoFoot = document.querySelector('.todo-foot');
 
 const filters = document.querySelector('.filters');
 
-//Create --
-const insertEvent = (e) => {
-    if(insert.value.length > 0){
-        const task = insert.value;
+//task 추가
+//insertInput에 할 일을 등록 하면 list에 해당 task를 추가하고, localStroage 에 저장 후 showList
+const insertInputEvent = (e) => {
+    if(insertInput.value.length > 0){
+        const task = insertInput.value;
         const item = {
             id : new Date().getTime(),
             done : false,
@@ -20,21 +21,22 @@ const insertEvent = (e) => {
         };
         list.push(item);
         localStorage.setItem('list',JSON.stringify(list));
-        showList(list, todoList, localStorage.getItem('state'));
+        showList(list, localStorage.getItem('state'));
 
-        insert.value = "";
-        insert.focus();
+        insertInput.value = "";
+        insertInput.focus();
     }
 }
 
-insert.addEventListener('blur',insertEvent);
-insert.addEventListener('keyup', (e) => {
-    if(e.keyCode === 13) insertEvent();
+insertInput.addEventListener('blur',insertInputEvent);
+insertInput.addEventListener('keyup', (e) => {
+    if(e.keyCode === 13) insertInputEvent();
 });
 
 //Read
+//li 안의 a태그에 selected 클래스를 추가하는 메서드
 const selectState = (state) => {
-    const liA = filters.querySelectorAll('li ');
+    const liA = filters.querySelectorAll('li a');
     for(const a of liA){
         if(state == a.textContent){
             a.className = 'selected';
@@ -44,9 +46,8 @@ const selectState = (state) => {
     }
 }
 
-//로컬스토리지 학습 -> list.length >0 이면 todo-foot 나오게 변경
-//map() 활용
-const showList = (list = [], todoList, state) => {
+//사용자가 가지고 있는 list 출력
+const showList = (list = [], state) => {
     if(list.length > 0){
         todoMain.style.display = 'block';
 
@@ -78,12 +79,12 @@ const showList = (list = [], todoList, state) => {
         if(chkLen == list.length) todoMain.firstElementChild.checked = true;
         else todoMain.firstElementChild.checked = false;
 
-        const todoCnt = todoFoot.querySelector('.todo-count');
-        todoCnt.textContent = `${list.length - chkLen} items left`;
+        todoFoot.firstElementChild.textContent = `${list.length - chkLen} items left`;
 
         if(chkLen > 0) todoFoot.lastElementChild.style.display = 'block';
         else todoFoot.lastElementChild.style.display = 'none';
 
+        //지금 어떤 state인지 (a태그에 selected 되있는 곳) 보여줌
         selectState(localStorage.getItem('state'));
     }else{
         todoMain.style.display = 'none';
@@ -92,7 +93,7 @@ const showList = (list = [], todoList, state) => {
     
 }
 
-showList(list, todoList, localStorage.getItem('state'));
+showList(list, localStorage.getItem('state'));
 
 //Update, Delete 
 const clickEvent = (e) => { //체크랑 삭제(Delete 기능)
@@ -101,7 +102,7 @@ const clickEvent = (e) => { //체크랑 삭제(Delete 기능)
     if(!el.matches('.chk') && !el.matches('button')) return;
 
     let filterArr;
-    let state = localStorage.getItem('state');
+    const state = localStorage.getItem('state');
     
     if(state == 'Active') filterArr = list.filter((item) => !item.done);
     else if(state == 'Completed') filterArr = list.filter((item) => item.done);
@@ -122,7 +123,7 @@ const clickEvent = (e) => { //체크랑 삭제(Delete 기능)
         localStorage.setItem('list', JSON.stringify(list));
     }
 
-    showList(list, todoList, state);
+    showList(list, state);
 }
 
 //update
@@ -151,7 +152,7 @@ const updateEvent = (e) => {
     }
 
     localStorage.setItem('list',JSON.stringify(list));
-    showList(list, todoList, localStorage.getItem('state'));
+    showList(list, localStorage.getItem('state'));
 }
 
 //=> 더블클릭하면 => input type text가 보여짐
@@ -192,9 +193,8 @@ const allChkEvent = (e) => {
         }
     }
     localStorage.setItem('list', JSON.stringify(list));
-    showList(list, todoList, localStorage.getItem('state'));
+    showList(list, localStorage.getItem('state'));
 }
-
 
 todoMain.firstElementChild.addEventListener('click', allChkEvent);  //allChk
 
@@ -211,11 +211,11 @@ const filterEvent = (e) => {
     if(el.textContent == 'Active'){
         localStorage.setItem('state','Active');
     }else if(el.textContent == 'Completed'){
-        localStorage.setItem('state','Completed');
+        localStorage.setItem('state', 'Completed');
     }else{
-        localStorage.setItem('state','All');
+        localStorage.setItem('state', 'All');
     }
-    showList(list, todoList, localStorage.getItem('state'));
+    showList(list,  localStorage.getItem('state'));
 }
 
 filters.addEventListener('click', filterEvent);
@@ -224,8 +224,8 @@ filters.addEventListener('click', filterEvent);
 const clearEvent = (e) => {
     const arr = list.filter((item) => !item.done);
     list = arr;
-    localStorage.setItem('list',JSON.stringify(arr));
-    showList(arr, todoList, localStorage.getItem('state'));
+    localStorage.setItem('list', JSON.stringify(arr));
+    showList(arr, localStorage.getItem('state'));
 }
 
 
