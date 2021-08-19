@@ -1,5 +1,5 @@
 //로컬 스토리지에 있는 todo들 혹은 맨 처음의 빈 배열
-const list =JSON.parse(localStorage.getItem('list')) || [];
+let list = JSON.parse(localStorage.getItem('list')) || [];
 
 const insert = document.querySelector('.new-todo');
 
@@ -22,20 +22,19 @@ const insertEvent = (e) => {
         localStorage.setItem('list',JSON.stringify(list));
         showList(list, todoList, localStorage.getItem('state'));
 
-        insert.value="";
+        insert.value = "";
         insert.focus();
     }
 }
 
-//Q. 원래 todoApp에서는 Alt Enter나 Ctrl Enter 누르면 안됐는데
 insert.addEventListener('blur',insertEvent);
-insert.addEventListener('keyup', (e)=>{
-    if(e.keyCode === 13) insertEvent(this);
+insert.addEventListener('keyup', (e) => {
+    if(e.keyCode === 13) insertEvent();
 });
 
 //Read
 const selectState = (state) => {
-    const liA = filters.querySelectorAll('li a');
+    const liA = filters.querySelectorAll('li ');
     for(const a of liA){
         if(state == a.textContent){
             a.className = 'selected';
@@ -51,12 +50,12 @@ const showList = (list = [], todoList, state) => {
     if(list.length > 0){
         todoMain.style.display = 'block';
 
-        let arr;
-        if(state == 'Active') arr = list.filter((item) => !item.done);
-        else if(state == 'Completed') arr = list.filter((item) => item.done);
-        else arr = list;
+        let filterArr;
+        if(state == 'Active') filterArr = list.filter((item) => !item.done);
+        else if(state == 'Completed') filterArr = list.filter((item) => item.done);
+        else filterArr = list;
         
-        todoList.innerHTML = arr.map((item, i) => {
+        todoList.innerHTML = filterArr.map((item, i) => {
             return `
             <li id="${item.id}" ${item.done ? 'class="completed"' : ''}>
                 <div class="task">
@@ -67,7 +66,7 @@ const showList = (list = [], todoList, state) => {
                 </div>
             </li>
             `;
-        }).join(''); //join을 안쓰면 빈 공백이 생김
+        }).join(''); //배열이 문자열로 바뀌면서 ( , )가 생기기 때문에 공백 발생 => join
 
         //목록 중 체크가 하나라도 풀리면 전체 체크박스 자동 해제, 
         //모든 목록이 다 체크 되었으면 전체 체크 박스 설정
@@ -88,7 +87,7 @@ const showList = (list = [], todoList, state) => {
         selectState(localStorage.getItem('state'));
     }else{
         todoMain.style.display = 'none';
-        localStorage.setItem('state','All'); ///////////////
+        localStorage.setItem('state','All');
     }
     
 }
@@ -101,16 +100,17 @@ const clickEvent = (e) => { //체크랑 삭제(Delete 기능)
 
     if(!el.matches('.chk') && !el.matches('button')) return;
 
-    let arr;
+    let filterArr;
     let state = localStorage.getItem('state');
-    if(state == 'Active') arr = JSON.parse(localStorage.getItem('list')).filter((item) => !item.done);
-    else if(state == 'Completed') arr = JSON.parse(localStorage.getItem('list')).filter((item) => item.done);
-    else arr = JSON.parse(localStorage.getItem('list'));
+    
+    if(state == 'Active') filterArr = list.filter((item) => !item.done);
+    else if(state == 'Completed') filterArr = list.filter((item) => item.done);
+    else filterArr = list;
 
     if(el.matches('.chk')){ //chk
         const idx = el.dataset.index;
-        arr[idx].done = !arr[idx].done;
-        localStorage.setItem('list', JSON.stringify(arr));
+        filterArr[idx].done = !filterArr[idx].done;
+        localStorage.setItem('list', JSON.stringify(filterArr));
         
     }else if(el.matches('button')){ //del
         const id = el.closest('li').id;
@@ -122,7 +122,7 @@ const clickEvent = (e) => { //체크랑 삭제(Delete 기능)
         localStorage.setItem('list', JSON.stringify(list));
     }
 
-    showList(JSON.parse(localStorage.getItem('list')), todoList, state);
+    showList(list, todoList, state);
 }
 
 //update
@@ -140,14 +140,18 @@ const updateEvent = (e) => {
         }
         
     }else{
+        //update 할때 text 의 value 가 없으면 삭제가 되는데, 이 경우에 한번 더 이벤트가 발생해서 -1반환
+        //그래서 반환된 idx가 -1보다 크면 splice (삭제) 할 수 있게 설정
         const idx = list.findIndex((item) => {
             return id == item.id;
         });
-        list.splice(idx,1);
+        if(idx > -1){
+            list.splice(idx, 1);
+        }
     }
 
     localStorage.setItem('list',JSON.stringify(list));
-    showList(JSON.parse(localStorage.getItem('list')), todoList, localStorage.getItem('state'));
+    showList(list, todoList, localStorage.getItem('state'));
 }
 
 //=> 더블클릭하면 => input type text가 보여짐
@@ -188,7 +192,7 @@ const allChkEvent = (e) => {
         }
     }
     localStorage.setItem('list', JSON.stringify(list));
-    showList(JSON.parse(localStorage.getItem('list')), todoList, localStorage.getItem('state'));
+    showList(list, todoList, localStorage.getItem('state'));
 }
 
 
@@ -211,18 +215,17 @@ const filterEvent = (e) => {
     }else{
         localStorage.setItem('state','All');
     }
-    showList(JSON.parse(localStorage.getItem('list')), todoList, localStorage.getItem('state'));
+    showList(list, todoList, localStorage.getItem('state'));
 }
 
 filters.addEventListener('click', filterEvent);
 
-//clearCompleted  Q..... /////////////////////////
+//clearCompleted
 const clearEvent = (e) => {
-    //list = list.filter((item) => !item.done); //
-    const arr = JSON.parse(localStorage.getItem('list')).filter((item) => !item.done);
-    //localStorage.removeItem('list');
+    const arr = list.filter((item) => !item.done);
+    list = arr;
     localStorage.setItem('list',JSON.stringify(arr));
-    showList(JSON.parse(localStorage.getItem('list')), todoList, localStorage.getItem('state'));
+    showList(arr, todoList, localStorage.getItem('state'));
 }
 
 
