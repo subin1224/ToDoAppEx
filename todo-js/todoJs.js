@@ -1,5 +1,10 @@
 //로컬 스토리지에 있는 todo들 혹은 맨 처음의 빈 배열
 let list = JSON.parse(localStorage.getItem('list')) || [];
+let state = localStorage.getItem('state');
+
+const F_ALL = 0;
+const F_ACTIVE = 1;
+const F_COMPLETED = 2;
 
 const insertInput = document.querySelector('.new-todo');
 
@@ -21,7 +26,7 @@ const insertInputEvent = (e) => {
         };
         list.push(item);
         localStorage.setItem('list',JSON.stringify(list));
-        showList(list, localStorage.getItem('state'));
+        showList(list, state);
 
         insertInput.value = "";
         insertInput.focus();
@@ -34,16 +39,14 @@ insertInput.addEventListener('keyup', (e) => {
 });
 
 //Read
-//li 안의 a태그에 selected 클래스를 추가하는 메서드
-const selectState = (state) => {
+//현재 state 에 맞게 filters의 li태그들의 select 여부
+const showState = (state) => {
     const liA = filters.querySelectorAll('li a');
     for(const a of liA){
-        if(state == a.textContent){
-            a.className = 'selected';
-        }else{
-            a.className = '';
-        }
+        a.classList.remove('selected');
     }
+
+    liA[state].className = 'selected';
 }
 
 //사용자가 가지고 있는 list 출력
@@ -52,8 +55,9 @@ const showList = (list = [], state) => {
         todoMain.style.display = 'block';
 
         let filterArr;
-        if(state == 'Active') filterArr = list.filter((item) => !item.done);
-        else if(state == 'Completed') filterArr = list.filter((item) => item.done);
+        //F_ACTIVE / F_COMPLETED / F_ALL 은 숫자형, state는 문자열 => 더 나은 해결방법 ? 
+        if(state == F_ACTIVE) filterArr = list.filter((item) => !item.done);
+        else if(state == F_COMPLETED) filterArr = list.filter((item) => item.done);
         else filterArr = list;
         
         todoList.innerHTML = filterArr.map((item, i) => {
@@ -76,24 +80,25 @@ const showList = (list = [], state) => {
             if(item.done) chkLen++;
         }
 
-        if(chkLen == list.length) todoMain.firstElementChild.checked = true;
+        if(chkLen === list.length) todoMain.firstElementChild.checked = true;
         else todoMain.firstElementChild.checked = false;
 
+        //Active 가 몇개인지 보여줌
         todoFoot.firstElementChild.textContent = `${list.length - chkLen} items left`;
 
+        //Clear completed를 보여줌
         if(chkLen > 0) todoFoot.lastElementChild.style.display = 'block';
         else todoFoot.lastElementChild.style.display = 'none';
 
-        //지금 어떤 state인지 (a태그에 selected 되있는 곳) 보여줌
-        selectState(localStorage.getItem('state'));
+        showState(state);
     }else{
         todoMain.style.display = 'none';
-        localStorage.setItem('state','All');
+        localStorage.setItem('state', F_ALL);
     }
     
 }
 
-showList(list, localStorage.getItem('state'));
+showList(list, state);
 
 //Update, Delete 
 const clickEvent = (e) => { //체크랑 삭제(Delete 기능)
@@ -102,10 +107,10 @@ const clickEvent = (e) => { //체크랑 삭제(Delete 기능)
     if(!el.matches('.chk') && !el.matches('button')) return;
 
     let filterArr;
-    const state = localStorage.getItem('state');
-    
-    if(state == 'Active') filterArr = list.filter((item) => !item.done);
-    else if(state == 'Completed') filterArr = list.filter((item) => item.done);
+    //state == 'Active' ? list.filter((item) => !item.done) : state == 'Completed' ? list.filter((item) => item.done) : list 
+
+    if(state === F_ACTIVE) filterArr = list.filter((item) => !item.done);
+    else if(state === F_COMPLETED) filterArr = list.filter((item) => item.done);
     else filterArr = list;
 
     if(el.matches('.chk')){ //chk
@@ -146,30 +151,31 @@ const updateEvent = (e) => {
         const idx = list.findIndex((item) => {
             return id == item.id;
         });
+
         if(idx > -1){
             list.splice(idx, 1);
         }
     }
 
     localStorage.setItem('list',JSON.stringify(list));
-    showList(list, localStorage.getItem('state'));
+    showList(list, state);
 }
 
 //=> 더블클릭하면 => input type text가 보여짐
 const dblclickEvent = (e) => {
     const el = e.target;
 
-    const input = document.createElement("input");
-    input.className = 'edit';
-    input.value = el.textContent;
+    const updateInput = document.createElement("input");
+    updateInput.className = 'edit';
+    updateInput.value = el.textContent;
 
     if(el.matches('label')){
-        el.parentNode.after(input);
+        el.parentNode.after(updateInput);
         el.closest('li').className = 'editing';
-        input.focus();
+        updateInput.focus();
 
-        input.addEventListener('blur', updateEvent); 
-        input.addEventListener('keyup', (e) => {
+        updateInput.addEventListener('blur', updateEvent); 
+        updateInput.addEventListener('keyup', (e) => {
             if(e.keyCode === 13) updateEvent(e);
         });
 
@@ -193,7 +199,7 @@ const allChkEvent = (e) => {
         }
     }
     localStorage.setItem('list', JSON.stringify(list));
-    showList(list, localStorage.getItem('state'));
+    showList(list, state);
 }
 
 todoMain.firstElementChild.addEventListener('click', allChkEvent);  //allChk
@@ -201,21 +207,16 @@ todoMain.firstElementChild.addEventListener('click', allChkEvent);  //allChk
 //filters
 const filterEvent = (e) => {
     const el = e.target;
-    //filters 안의 li 의 a태그들의 class 삭제
-    const liA = filters.querySelectorAll('li a');
-    for(const a of liA){
-        a.classList.remove('selected');
-    }
-    el.className = 'selected';
-    
+ 
     if(el.textContent == 'Active'){
-        localStorage.setItem('state','Active');
+        localStorage.setItem('state',F_ACTIVE);
     }else if(el.textContent == 'Completed'){
-        localStorage.setItem('state', 'Completed');
+        localStorage.setItem('state', F_COMPLETED);
     }else{
-        localStorage.setItem('state', 'All');
+        localStorage.setItem('state', F_ALL);
     }
-    showList(list,  localStorage.getItem('state'));
+    state = localStorage.getItem('state');
+    showList(list, state);
 }
 
 filters.addEventListener('click', filterEvent);
@@ -225,8 +226,7 @@ const clearEvent = (e) => {
     const arr = list.filter((item) => !item.done);
     list = arr;
     localStorage.setItem('list', JSON.stringify(arr));
-    showList(arr, localStorage.getItem('state'));
+    showList(arr, state);
 }
-
 
 todoFoot.lastElementChild.addEventListener('click', clearEvent);
