@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TodoApp</title>
+</head>
+<body>
+    <header class="header" aria-label="제목">
+        <h1>todos</h1>
+    </header>
+
+    <section class="todo" aria-label="할 일">
+        <article class="todo-head" aria-label="새로운 할 일 작성">
+            <input type="text" class="new-todo" placeholder="What needs to be done?" autofocus/>
+        </article>
+        
+        <article class="todo-main" style="display:none" aria-label="할 일 목록">
+            <input type="checkbox" class="allChk" id="allChk">
+            <label for="allChk"></label>
+            
+            <ul class="todo-list" draggable="true"></ul>
+            
+            <div class="todo-foot" aria-label="필터링">
+                <span class="todo-count"></span>
+                <ul class="filters">
+                    <li>
+                        <a href="#/" class="selected">All</a>
+                    </li>
+                    <li>
+                        <a href="#/active">Active</a>
+                    </li>
+                    <li>
+                        <a href="#/completed">Completed</a>
+                    </li>
+                </ul>
+                <button class="clear-completed" style="display:none">Clear completed</button>
+            </div>
+
+        </article>
+    </section>
+
+    <footer class="footer" aria-label="기타사항">
+        <p>Double-click to edit a todo</p>
+        <p>Exem OJT 4week Subin Lee</p>
+        <p>Make todoApp</p>
+        <p><a href="https://github.com/subin1224/ToDoAppEx">Subin's Github</a></p>
+    </footer>
+
+    <link rel="stylesheet" href="todo-css/todo.css">
+    <script src="todo-js/todoJs.js"></script>
+</body>
+</html>

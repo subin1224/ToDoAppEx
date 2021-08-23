@@ -80,8 +80,8 @@ const showList = (list = [], state) => {
             if(item.done) chkLen++;
         }
 
-        if(chkLen === list.length) todoMain.firstElementChild.checked = true;
-        else todoMain.firstElementChild.checked = false;
+        if(chkLen === list.length) document.querySelector('#allChk').checked = true;
+        else document.querySelector('#allChk').checked = false;
 
         //Active 가 몇개인지 보여줌
         todoFoot.firstElementChild.textContent = `${list.length - chkLen} items left`;
@@ -109,8 +109,8 @@ const clickEvent = (e) => { //체크랑 삭제(Delete 기능)
     let filterArr;
     //state == 'Active' ? list.filter((item) => !item.done) : state == 'Completed' ? list.filter((item) => item.done) : list 
 
-    if(state === F_ACTIVE) filterArr = list.filter((item) => !item.done);
-    else if(state === F_COMPLETED) filterArr = list.filter((item) => item.done);
+    if(state == F_ACTIVE) filterArr = list.filter((item) => !item.done);
+    else if(state == F_COMPLETED) filterArr = list.filter((item) => item.done);
     else filterArr = list;
 
     if(el.matches('.chk')){ //chk
@@ -202,7 +202,7 @@ const allChkEvent = (e) => {
     showList(list, state);
 }
 
-todoMain.firstElementChild.addEventListener('click', allChkEvent);  //allChk
+document.querySelector('#allChk').addEventListener('click', allChkEvent);  //allChk
 
 //filters
 const filterEvent = (e) => {
