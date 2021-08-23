@@ -11,35 +11,35 @@
         <h1>todos</h1>
     </header>
 
-    <section class="todo" aria-label="할 일">
-        <article class="todo-head" aria-label="새로운 할 일 작성">
-            <input type="text" class="new-todo" placeholder="What needs to be done?" autofocus/>
-        </article>
-        
-        <article class="todo-main" style="display:none" aria-label="할 일 목록">
+    <article class="todo" aria-label="할 일">
+       <!--
+        <header class="todo-head" aria-label="새로운 할 일 작성">
             <input type="checkbox" class="allChk" id="allChk">
             <label for="allChk"></label>
-            
-            <ul class="todo-list"></ul>
-            
-            <div class="todo-foot" aria-label="필터링">
-                <span class="todo-count"></span>
-                <ul class="filters">
-                    <li>
-                        <a href="#/" class="selected">All</a>
-                    </li>
-                    <li>
-                        <a href="#/active">Active</a>
-                    </li>
-                    <li>
-                        <a href="#/completed">Completed</a>
-                    </li>
-                </ul>
-                <button class="clear-completed" style="display:none">Clear completed</button>
-            </div>
+            <input type="text" class="new-todo" placeholder="What needs to be done?" autofocus/>
+        </header>
+        
+        <section class="todo-main" style="display:none" aria-label="할 일 목록">
+            <ul class="todo-list" draggable="true"></ul>    
+        </section>
 
-        </article>
-    </section>
+        <footer class="todo-foot" aria-label="필터링">
+            <span class="todo-count"></span>
+            <ul class="filters">
+                <li>
+                    <a href="#/" class="selected">All</a>
+                </li>
+                <li>
+                    <a href="#/active">Active</a>
+                </li>
+                <li>
+                    <a href="#/completed">Completed</a>
+                </li>
+            </ul>
+            <button class="clear-completed" style="display:none">Clear completed</button>
+        </footer>
+        -->
+    </article>
 
     <footer class="footer" aria-label="기타사항">
         <p>Double-click to edit a todo</p>
@@ -49,6 +49,6 @@
     </footer>
 
     <link rel="stylesheet" href="todo-css/todo.css">
-    <script src="todo-js/todoJs.js"></script>
+    <script src="./src/main.js" type="module"></script>
 </body>
 </html>
