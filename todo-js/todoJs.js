@@ -17,7 +17,7 @@ const filters = document.querySelector('.filters');
 //task 추가
 //insertInput에 할 일을 등록 하면 list에 해당 task를 추가하고, localStroage 에 저장 후 showList
 const insertInputEvent = (e) => {
-    if(insertInput.value.length > 0){
+    if(insertInput.value.trim().length > 0){
         const task = insertInput.value;
         const item = {
             id : new Date().getTime(),
@@ -82,7 +82,7 @@ const showList = (list = [], state) => {
 
         if(chkLen === list.length) document.querySelector('#allChk').checked = true;
         else document.querySelector('#allChk').checked = false;
-
+        
         //Active 가 몇개인지 보여줌
         todoFoot.firstElementChild.textContent = `${list.length - chkLen} items left`;
 
