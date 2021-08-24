@@ -1,6 +1,6 @@
 export default class Component {
     $target;
-    $props;
+    $props; //부모 컴포넌트가 자식 ㅓㅁ포넌트에게 상태 혹은 메소드를 넘겨주기 위해
     $state;
 
     constructor ($target, $props) {
@@ -12,7 +12,7 @@ export default class Component {
     }
 
     setup () {}
-    mounted () {}
+    mounted () {}   //render 이후에 추가적인 기능을 수행하기 위해
     template () { return '';}
     render () {
         this.$target.innerHTML = this.template();
@@ -38,4 +38,5 @@ export default class Component {
     removeEvent (eventType, callback) {
         this.$target.removeEventListener(eventType, callback);
     }
+
 }

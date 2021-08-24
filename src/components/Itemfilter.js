@@ -20,19 +20,24 @@ export default class Itemfilter extends Component {
     }
 
     setEvent () {
-        const { filterItem } = this.$props;
-        this.addEvent('click', '.filters', ({ target }) => {
-            /*
-            let nowLink = document.location.href; //현재 주소
-            let slashIdx = filterLink.lastIndexOf('/'); //마지막 / 의 위치
-            let filterLink = nowLink.substr(slashIdx-1);
-
-            let isFilter = (filterLink == document.querySelector('.filters').firstElementChild
-                .getAttribute('href')) ? 0 : ((filterLink == document.querySelector('.filters')
-                    .lastElementChild.getAttribute('href') ? 2 : 1));
+        const { filterItem, clearCompleted } = this.$props;
+        
+        this.addEvent('click', '.filters li a', ({ target }) => {
+            
+            /* 주소로 필터해보는걸 생각 했었음
+            let isFilter = (target.getAttribute('href') == document.querySelector('.filters li').firstElementChild
+                .getAttribute('href')) ? 0 : (target.getAttribute('href') == document.querySelector('.filters')
+                    .lastElementChild.firstElementChild.getAttribute('href') ? 2 : 1);
+            
+            filterItem(Number(isFilter));
             */
             filterItem(Number(target.dataset.isFilter));
         });
+
+        this.addEvent('click', '.clear-completed', () => {
+            clearCompleted();
+        });
     }
+    
 }
 
