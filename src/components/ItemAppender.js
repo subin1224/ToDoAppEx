@@ -18,7 +18,7 @@ export default class ItemAppender extends Component{
         
         //엔터키 누르면 focusout 까지 이벤트가 두번 먹힘
         this.addEvent('keyup', '.new-todo', ({ key, target }) => {
-            if (key !== 'Enter') return;
+            if(key !== 'Enter') return;
             if(target.value.trim().length > 0) addItem(target.value);
         });
       
