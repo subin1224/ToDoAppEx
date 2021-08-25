@@ -1,8 +1,9 @@
 # 📋TodoApp 만들기
 
 <p align="center"> 
-<img src="https://s3.us-west-2.amazonaws.com/secure.notion-static.com/46fe1461-a27a-4b17-a5ff-8ae1d87d436b/Untitled.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAT73L2G45O3KS52Y5%2F20210812%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20210812T052133Z&X-Amz-Expires=86400&X-Amz-Signature=4935de9466e9a69a3408bc84c7d04e96ca829d58dff9aa5f7e23607f859e6c43&X-Amz-SignedHeaders=host&response-content-disposition=filename%20%3D%22Untitled.png%22">
-
+    
+![todos](https://user-images.githubusercontent.com/76253952/130717770-5187abb6-0d61-426a-89c8-960e99e433a1.png)
+    
 > HTML5, CSS3, ES6+ 를 이용하여 todoApp 제작하기
 </p>
 
