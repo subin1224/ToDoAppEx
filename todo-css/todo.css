@@ -236,6 +236,16 @@ button {
 	display: block;
 }
 
+/* 새롭게 추가 된 부분 (드래그 부분) */
+.todo-list li.is-dragging label{
+	color: rgb(224, 202, 202);
+}
+
+.todo-list li.guide{
+	border-bottom: 3px solid #e09f9f;
+}
+
+
 .todo-foot {
 	color: #777;
 	padding: 10px 15px;
