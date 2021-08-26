@@ -18,7 +18,7 @@ export default class App extends Component{
 
     mounted () {
         const { filteredItems, addItem, deleteItem, toggleItem, filterItem, allChk, 
-                clearCompleted, updateItem, dragStartItem, dragEndItem, dragOverItem,
+                clearCompleted, updateItem, dragStartItem, dragEndItem, 
                 dragEnterItem, dragLeaveItem, dropItem }  = this;
         const $itemAppender = this.$target.querySelector('.todo-head');
         const $items = this.$target.querySelector('.todo-main');
@@ -40,7 +40,6 @@ export default class App extends Component{
                 updateItem: updateItem.bind(this),
                 dragStartItem: dragStartItem.bind(this),
                 dragEndItem: dragEndItem.bind(this),
-                dragOverItem: dragOverItem.bind(this),
                 dragEnterItem: dragEnterItem.bind(this),
                 dragLeaveItem: dragLeaveItem.bind(this),
                 dropItem: dropItem.bind(this),
@@ -182,10 +181,7 @@ export default class App extends Component{
 
         const item = document.querySelectorAll('.todo-list li');
         item[index].classList.remove('is-dragging');
-    }
-
-    dragOverItem (event) {
-        event.preventDefault();
+        item[index].classList.remove('guide');
     }
 
     dragEnterItem (seq) {
@@ -204,9 +200,15 @@ export default class App extends Component{
         item[index].classList.remove('guide');
     }
 
-    dropItem (seq) {    
-        //dragLeaveItem(seq);
-        //deleteItem(seq);
+    dropItem (startseq,dropseq) {    
+        const items = [ ...this.$state.items ];
+        const startidx = items.findIndex(t => t.seq === startseq);
+        const endidx = items.findIndex(t => t.seq === dropseq);
 
+        const temp = items[startidx];
+        items[startidx] = items[endidx];
+        items[endidx] = temp; 
+
+        this.setState({items});
     }
 }

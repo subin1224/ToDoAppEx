@@ -16,6 +16,7 @@ export default class Component {
     template () { return '';}
     render () {
         this.$target.innerHTML = this.template();
+        //this.$target.appendChild( this.template() );
         this.mounted();
     }
     setEvent () {}
