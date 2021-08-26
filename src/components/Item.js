@@ -4,6 +4,10 @@ export default class Item extends Component {
     template () {
         const { filteredItems } = this.$props;
 
+        //
+        const $allChk = document.createElement('input');
+
+        
         return `    
             <input type="checkbox" class="allChk" id="allChk">
             <label for="allChk"></label>
@@ -26,7 +30,7 @@ export default class Item extends Component {
 
     setEvent () {
         const { deleteItem, toggleItem, allChk, updateItem, 
-            dragStartItem, dragEndItem, dragOverItem, dragEnterItem,
+            dragStartItem, dragEndItem, dragEnterItem,
             dragLeaveItem, dropItem } = this.$props;
         
         //삭제
@@ -76,6 +80,9 @@ export default class Item extends Component {
         */
         //dragstart, dragEnd, dropItem, dragover, dragenter, dragleave
         this.addEvent('dragstart', '.todo-list li', ({target}) => {
+            event.dataTransfer.effectAllowed = 'move';
+            event.dataTransfer.setData('data-seq', target.closest('[data-seq]').dataset.seq);
+
             dragStartItem(Number(target.closest('[data-seq]').dataset.seq));
         });
 
@@ -83,9 +90,10 @@ export default class Item extends Component {
             dragEndItem(Number(target.closest('[data-seq]').dataset.seq));
         });
 
-        this.addEvent('dragover', '.todo-list li', (target) => {
-            target.preventDefault();
-            //dragOverItem(target.closest('[data-seq]').dataset.seq); //
+        this.addEvent('dragover', '.todo-list li', (event) => {
+            event.preventDefault();
+            event.dataTransfer.dropEffect = 'move';
+            return false;
         });
 
         this.addEvent('dragenter', '.todo-list li', ({target}) => {
@@ -93,11 +101,13 @@ export default class Item extends Component {
         });
 
         this.addEvent('dragleave', '.todo-list li', ({target}) => {
+            event.stopPropagation();
             dragLeaveItem(Number(target.closest('[data-seq]').dataset.seq));
         });
 
         this.addEvent('drop', '.todo-list li', ({target}) => {
-            dropItem(Number(target.closest('[data-seq]').dataset.seq));
+            //드래그 시작한 seq, 드랍 한 seq
+            dropItem(Number(event.dataTransfer.getData('data-seq')) ,Number(target.closest('[data-seq]').dataset.seq));
         });
 
     }

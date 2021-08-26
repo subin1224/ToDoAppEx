@@ -8,7 +8,7 @@ export default class ItemAppender extends Component{
     }
 
     setEvent () {
-        //공백이면 add 못하게 !! 작업 해야 함 .... 
+        //공백이면 add 못하게
         const { addItem } = this.$props;
 
         //왜 blur이벤트는 발생이 안되는거지ㅠㅠ
