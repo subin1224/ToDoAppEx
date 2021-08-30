@@ -22,19 +22,11 @@ export default class Itemfilter extends Component {
     setEvent () {
         const { filterItem, clearCompleted } = this.$props;
         
-        this.addEvent('click', '.filters li a', ({ target }) => {
-            
-            /* 주소로 필터해보는걸 생각 했었음
-            let isFilter = (target.getAttribute('href') == document.querySelector('.filters li').firstElementChild
-                .getAttribute('href')) ? 0 : (target.getAttribute('href') == document.querySelector('.filters')
-                    .lastElementChild.firstElementChild.getAttribute('href') ? 2 : 1);
-            
-            filterItem(Number(isFilter));
-            */
-            filterItem(Number(target.dataset.isFilter));
+        this.addEvent('click', '.filters li a', function (e) {
+            filterItem(Number(e.target.dataset.isFilter));
         });
 
-        this.addEvent('click', '.clear-completed', () => {
+        this.addEvent('click', '.clear-completed', function () {
             clearCompleted();
         });
     }

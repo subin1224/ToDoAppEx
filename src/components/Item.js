@@ -4,67 +4,61 @@ export default class Item extends Component {
     template () {
         const { filteredItems } = this.$props;
 
-        //
-        const $allChk = document.createElement('input');
-
-        
         return `    
             <input type="checkbox" class="allChk" id="allChk">
             <label for="allChk"></label>
 
             <ul class="todo-list">
-            ${filteredItems.map(({contents, done, seq}) => `
-                <li draggable="true" data-seq=${seq} ${done ? 'class="completed"' : ''}>
+            ${ filteredItems.map(( {contents, done, seq} ) => `
+                <li draggable="true" data-seq=${ seq } ${ done ? 'class="completed"' : '' }>
                     <div class="task">
-                        <input type="checkbox" class="chk" data-seq=${seq}
-                            ${done ? 'checked' : ''} />
-                        <label>${contents}</label>
+                        <input type="checkbox" class="chk" data-seq=${ seq }
+                            ${ done ? 'checked' : '' } />
+                        <label>${ contents }</label>
                         <button class="del"></button>
                     </div>
                 </li>
-            `).join('')}
+            `).join('') }
             </ul>
         `;    
-
     }
 
     setEvent () {
         const { deleteItem, toggleItem, allChk, updateItem, 
             dragStartItem, dragEndItem, dragEnterItem,
-            dragLeaveItem, dropItem } = this.$props;
+            dragLeaveItem, dropItem, isFilter } = this.$props;
         
         //삭제
-        this.addEvent('click', '.del', ({target}) => {
-            deleteItem(Number(target.closest('[data-seq]').dataset.seq));
+        this.addEvent ('click', '.del', function (e) {
+            deleteItem(Number(e.target.closest('[data-seq]').dataset.seq));
         });
 
         //체크
-        this.addEvent('click', '.chk', ({target}) => {
-            toggleItem(Number(target.closest('[data-seq]').dataset.seq));
+        this.addEvent ('click', '.chk', function (e) {
+            toggleItem(Number(e.target.closest('[data-seq]').dataset.seq));
         });
 
         //전체 체크
-        this.addEvent('click', '.allChk', ({target}) => {
-            allChk(target);
+        this.addEvent ('click', '.allChk', function (e) {
+            allChk(e.target);
         });
 
         //수정
-        this.addEvent('dblclick', '.task label', ({target}) => {
-            //const el = e.target;
+        this.addEvent ('dblclick', '.task label', function (e) {
+            const $updateInput = document.createElement("input");
+            $updateInput.className = 'edit';
+            $updateInput.value = e.target.textContent;
+            e.target.parentNode.after($updateInput);
 
-            const _updateInput = document.createElement("input");
-            _updateInput.className = 'edit';
-            _updateInput.value = target.textContent;
-            target.parentNode.after(_updateInput);
-
-            target.closest('li').className = 'editing';
-            _updateInput.focus();
+            e.target.closest('li').className = 'editing';
+            $updateInput.focus();
             
-            //_updateInput.addEventListener('blur', updateItem(Number(target.closest('[data-seq]').dataset.seq), _updateInput.value)); 
+            $updateInput.addEventListener('blur', function (e) {
+                updateItem(Number(e.target.closest('[data-seq]').dataset.seq), $updateInput.value);
+            }); 
             
-            //_updateInput에 Event 추가 => 후에 수정할 것 !!
-            _updateInput.addEventListener('keyup', (e) => {
-                if(e.keyCode === 13) updateItem(Number(target.closest('[data-seq]').dataset.seq), _updateInput.value);
+            $updateInput.addEventListener('keyup', (e) => {
+                if(e.keyCode === 13) updateItem(Number(e.target.closest('[data-seq]').dataset.seq), $updateInput.value);
             });
             
         });
@@ -79,36 +73,40 @@ export default class Item extends Component {
             다른 엘리먼트 위에 드랍 될 때의 스타일 => 모든 드래그 관련 클래스 삭제
         */
         //dragstart, dragEnd, dropItem, dragover, dragenter, dragleave
-        this.addEvent('dragstart', '.todo-list li', ({target}) => {
-            event.dataTransfer.effectAllowed = 'move';
-            event.dataTransfer.setData('data-seq', target.closest('[data-seq]').dataset.seq);
 
-            dragStartItem(Number(target.closest('[data-seq]').dataset.seq));
-        });
-
-        this.addEvent('dragend', '.todo-list li', ({target}) => {
-            dragEndItem(Number(target.closest('[data-seq]').dataset.seq));
-        });
-
-        this.addEvent('dragover', '.todo-list li', (event) => {
-            event.preventDefault();
-            event.dataTransfer.dropEffect = 'move';
-            return false;
-        });
-
-        this.addEvent('dragenter', '.todo-list li', ({target}) => {
-            dragEnterItem(Number(target.closest('[data-seq]').dataset.seq));
-        });
-
-        this.addEvent('dragleave', '.todo-list li', ({target}) => {
-            event.stopPropagation();
-            dragLeaveItem(Number(target.closest('[data-seq]').dataset.seq));
-        });
-
-        this.addEvent('drop', '.todo-list li', ({target}) => {
-            //드래그 시작한 seq, 드랍 한 seq
-            dropItem(Number(event.dataTransfer.getData('data-seq')) ,Number(target.closest('[data-seq]').dataset.seq));
-        });
+        if( isFilter === 0 ){
+            this.addEvent ('dragstart', '.todo-list li', function (e) {
+                e.dataTransfer.effectAllowed = 'move';
+                e.dataTransfer.setData('data-seq', e.target.closest('[data-seq]').dataset.seq);
+    
+                dragStartItem (Number(e.target.closest('[data-seq]').dataset.seq));
+            });
+    
+            this.addEvent ('dragend', '.todo-list li', function (e) {
+                dragEndItem (Number(e.target.closest('[data-seq]').dataset.seq));
+            });
+    
+            this.addEvent ('dragover', '.todo-list li', function (e) {
+                e.stopPropagation();
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+            });
+    
+            this.addEvent ('dragenter', '.todo-list li', function (e) {
+                dragEnterItem (Number(e.target.closest('[data-seq]').dataset.seq));
+            });
+    
+            this.addEvent ('dragleave', '.todo-list li', function (e) {
+                e.stopPropagation();
+                e.preventDefault();
+                dragLeaveItem (Number(e.target.closest('[data-seq]').dataset.seq));
+            });
+    
+            this.addEvent('drop', '.todo-list li', function (e) {
+                //드래그 시작한 seq, 드랍 한 seq
+                dropItem (Number(e.dataTransfer.getData('data-seq')) ,Number(e.target.closest('[data-seq]').dataset.seq));
+            });
+        }
 
     }
 }

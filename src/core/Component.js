@@ -16,7 +16,6 @@ export default class Component {
     template () { return '';}
     render () {
         this.$target.innerHTML = this.template();
-        //this.$target.appendChild( this.template() );
         this.mounted();
     }
     setEvent () {}
@@ -29,22 +28,18 @@ export default class Component {
     //이벤트 버블링 추상화 => 이벤트 버블링을 통한 등록 과정을 메서드로 만듦
     // selector에 명시한 것 보다 더 하위 요소가 선택되는 경우가 있을 땐
     // closest를 이용하여 처리
-    addEvent (eventType, selector, callback) {
+    addEvent (eventType, selector, callback, useCapture = false) {
         const children = [ ...this.$target.querySelectorAll(selector) ];
         const isTarget = (target) => children.includes(target) || target.closest(selector);
-       
-        this.$target.addEventListener(eventType, event => {
-            if(!isTarget(event.target)) return false;
-            if(eventType === 'dragover'){
-                event.preventDefault();
-                event.dataTransfer.dropEffect = "move";
-            } 
-            callback(event);
-        });
-    }
 
-    removeEvent (eventType, callback) {
-        this.$target.removeEventListener(eventType, callback);
+        this.$target.addEventListener(eventType, function(e){
+            if(!isTarget(e.target)) return false;
+            if(eventType === 'dragover'){
+                e.preventDefault();
+                e.dataTransfer.dropEffect = "move";
+            } 
+            callback(e);
+        }, useCapture);
     }
 
 }
