@@ -4,11 +4,11 @@ import ItemAppender from "./components/ItemAppender.js";
 import Itemfilter from "./components/Itemfilter.js";
 
 export default class App extends Component{
-    setup () {
+    setup(){
         this.$state = JSON.parse(localStorage.getItem('todoList')) || [];
     }
 
-    template () { 
+    template(){ 
         return `
             <header class="todo-head" aria-label="새로운 할 일 작성"></header>
             <section class="todo-main" style="display:none" aria-label="할 일 목록"></section>
@@ -16,10 +16,11 @@ export default class App extends Component{
         `;
     }
 
-    mounted () {
+    mounted(){
         const { filteredItems, addItem, deleteItem, toggleItem, filterItem, allChk, 
                 clearCompleted, updateItem, dragStartItem, dragEndItem, 
                 dragEnterItem, dragLeaveItem, dropItem }  = this;
+
         const $itemAppender = this.$target.querySelector('.todo-head');
         const $items = this.$target.querySelector('.todo-main');
         const $itemFilter = this.$target.querySelector('.todo-foot');
@@ -27,11 +28,13 @@ export default class App extends Component{
         new ItemAppender($itemAppender, {
             addItem: addItem.bind(this)
         });
-        
-        if(filteredItems){  //task들이 있을때 todo-main과 todo-foot 작업 진행
-            $items.style.display = 'block';
-            $itemFilter.style.display = 'block';
-    
+
+        if(this.$state.items){ 
+            if(this.$state.items.length > 0){
+                $items.style.display = 'block';
+                $itemFilter.style.display = 'block';
+            }
+
             new Item($items, {
                 filteredItems,
                 deleteItem: deleteItem.bind(this),
@@ -43,6 +46,7 @@ export default class App extends Component{
                 dragEnterItem: dragEnterItem.bind(this),
                 dragLeaveItem: dragLeaveItem.bind(this),
                 dropItem: dropItem.bind(this),
+                isFilter : this.$state.isFilter,
             });
             
             new Itemfilter($itemFilter, {
@@ -56,151 +60,132 @@ export default class App extends Component{
     }
 
     //필터된 task들을 가져옴
-    get filteredItems () {  
+    get filteredItems(){
         const { isFilter, items } = this.$state;
-        if(items.length > 0 ){
-            return items.filter(({ done }) => (isFilter === 1 && !done) ||
-                (isFilter === 2 && done) ||
-                    isFilter === 0);
+        if(items){
+            return items.filter(({ done }) => ( isFilter === this._ACTIVE && !done ) ||
+                ( isFilter === this._COMPLETED && done ) ||
+                    isFilter === this._ALL );
         }
     }
 
     //추가
-    addItem (contents) {    //item 추가 -> 후에 여기서 로컬스토리지 작업 예상
+    addItem(contents){
         const { items } = this.$state;
         const seq = new Date().getTime();
         const done = false;
-        this.setState({
+        this.setState( items ? {
             items: [
                 ...items,
-                {seq, contents, done}
+                { seq, contents, done }
             ]
+        } : { 
+            isFilter : 0,
+            items: [{ seq, contents, done }] 
         });
         document.querySelector('.new-todo').focus();
     }
 
     //삭제
-    deleteItem (seq) {
+    deleteItem(seq){
         const items = [ ...this.$state.items ];
-        items.splice(items.findIndex( t => t.seq === seq), 1);
-        this.setState({items});
+        items.splice(items.findIndex( t => t.seq === seq ), 1 );
+        this.setState({ items });
     }
 
     //체크
-    toggleItem (seq) {
+    toggleItem(seq){
         const items = [ ...this.$state.items ];
-        const index = items.findIndex(t => t.seq === seq);
+        const index = items.findIndex( t => t.seq === seq );
         items[index].done = !items[index].done;
-        this.setState({items});
+        this.setState({ items });
     }
 
     //필터 select 박스 클릭 이벤트
-    filterItem (isFilter) {
+    filterItem(isFilter){
         this.setState({ isFilter });
-
-        this.showSelectedFilter(isFilter);
+        this.showSelectedFilter( isFilter );
     }
 
-    ////////////////////////////////////////// 여기부터는 .... 3번 .... 
     //isFilter 에 따른 select 클래스 부여
-    showSelectedFilter (isFilter) {
-        const liA = document.querySelectorAll('.filters li a');
+    showSelectedFilter(isFilter){
+        const liA = document.querySelectorAll( '.filters li a' );
         for(const a of liA){
-            a.classList.remove('selected');
+            a.classList.remove( 'selected' );
         }
-        
         liA[isFilter].className = 'selected';
     }
 
     //전체 체크박스 설정/해제
-    allChk (target) {
+    allChk(target){
         const items = [ ...this.$state.items ];
-        //전체 체크 설정 및 해제
-        if(target.checked){
-            for(const item of items){
-                item.done = true;
-            }
-        }else{
-            for(const item of items){
-                item.done = false;
-            }
+        for(const item of items){
+            item.done = ( target.checked ) ? true : false ;
         }
-        this.setState({items});
+        this.setState({ items });
     }
 
-    //렌더 이후의 작업 setState XX 
-    //전체가 체크 상태라면 전체체크 되게, 아니라면 해제 &&& 
-    //todo-count 에 textContent
-    isAllChk (items) {
+    isAllChk(items){
         const $todoFoot = this.$target.querySelector('.todo-foot');
-
         //render 한 이후로 체크 표시 
         let chkLen = 0;
         for(const item of items){
-            if(item.done) chkLen++;
+            if( item.done ) chkLen++;
         }
          
-        document.querySelector('#allChk').checked = ((chkLen === items.length) ? true : false);
-        $todoFoot.firstElementChild.textContent = `${items.length - chkLen} items left`;
-        $todoFoot.lastElementChild.style.display = ((chkLen > 0 ) ? 'block' : 'none' );
+        document.querySelector( '#allChk' ).checked = (( chkLen === items.length ) ? true : false);
+        $todoFoot.firstElementChild.textContent = `${ items.length - chkLen } items left`;
+        $todoFoot.lastElementChild.style.display = (( chkLen > 0 ) ? 'block' : 'none');
     }
 
     //체크된 부분 삭제
-    clearCompleted () {
+    clearCompleted(){
         let items = [ ...this.$state.items ];
         const clearItems = items.filter((item) => !item.done);
         items = clearItems;
-        this.setState({items});
+        this.setState({ items });
     }
 
     //더블클릭 하면 수정
-    updateItem (seq, contents) {
+    updateItem(seq, contents){
         const items = [ ...this.$state.items ];
         const index = items.findIndex(t => t.seq === seq);
 
-        if(contents.trim().length > 0){
+        if( contents.trim().length > 0 ){
             items[index].contents = contents;
         }else{
             items.splice(index, 1);
         }
-        this.setState({items});
-    }
-
-    //드래그 -> 클래스 추가
-    dragStartItem (seq) {
-        const items = [ ...this.$state.items ];
+        this.setState({ items });
+    }  
+    
+    //drag 작업
+    findItemForli(seq){
+        const items = this.filteredItems;   //필터아이템으로 변경
         const index = items.findIndex(t => t.seq === seq);
 
         const item = document.querySelectorAll('.todo-list li');
-        item[index].classList.add('is-dragging');
+        return item[index];
     }
 
-    dragEndItem (seq) {
-        const items = [ ...this.$state.items ];
-        const index = items.findIndex(t => t.seq === seq);
-
-        const item = document.querySelectorAll('.todo-list li');
-        item[index].classList.remove('is-dragging');
-        item[index].classList.remove('guide');
+    dragStartItem(seq){
+        this.findItemForli(seq).classList.add('is-dragging');
     }
 
-    dragEnterItem (seq) {
-        const items = [ ...this.$state.items ];
-        const index = items.findIndex(t => t.seq === seq);
-
-        const item = document.querySelectorAll('.todo-list li');
-        item[index].classList.add('guide');
+    dragEndItem(seq){
+        this.findItemForli(seq).classList.remove('is-dragging');
+        this.findItemForli(seq).classList.remove('guide');
     }
 
-    dragLeaveItem (seq) {
-        const items = [ ...this.$state.items ];
-        const index = items.findIndex(t => t.seq === seq);
-
-        const item = document.querySelectorAll('.todo-list li');
-        item[index].classList.remove('guide');
+    dragEnterItem(seq){
+        this.findItemForli(seq).classList.add('guide');
     }
 
-    dropItem (startseq,dropseq) {    
+    dragLeaveItem(seq){
+        this.findItemForli(seq).classList.remove('guide');
+    }
+
+    dropItem(startseq, dropseq){    
         const items = [ ...this.$state.items ];
         const startidx = items.findIndex(t => t.seq === startseq);
         const endidx = items.findIndex(t => t.seq === dropseq);
@@ -209,6 +194,6 @@ export default class App extends Component{
         items[startidx] = items[endidx];
         items[endidx] = temp; 
 
-        this.setState({items});
+        this.setState({ items });
     }
 }
