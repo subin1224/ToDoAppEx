@@ -10,15 +10,21 @@ export default class ItemAppender extends Component{
     setEvent () {
         //공백이면 add 못하게
         const { addItem } = this.$props;
- 
-        this.addEvent ('keyup', '.new-todo', function ({ key,target }) {
-            if(key !== 'Enter') return;
-            if(target.value.trim().length > 0) addItem(target.value);
-        });
-        
-        //Issue
-        this.addEvent ('blur', '.new-todo', function (e) {
+
+        const addByEnter = function(e){
+            if(e.key !== 'Enter') return;
+            //e.target.parent.removeEventListener('blur', addByBlur);
             if(e.target.value.trim().length > 0) addItem(e.target.value);
-        });
+        }
+
+        const addByBlur = function(e){
+            console.log('blur !!! ');
+            if(e.target.value.trim().length > 0) addItem(e.target.value);
+        }
+
+        this.addEvent('keyup', '.new-todo', addByEnter);
+
+        //Issue
+        //this.addEvent('blur', '.new-todo', addByBlur, true);
     }
 }

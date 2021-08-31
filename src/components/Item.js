@@ -1,9 +1,9 @@
 import Component from "../core/Component.js";
 
 export default class Item extends Component {
-    template () {
+    template(){
         const { filteredItems } = this.$props;
-
+        
         return `    
             <input type="checkbox" class="allChk" id="allChk">
             <label for="allChk"></label>
@@ -23,28 +23,28 @@ export default class Item extends Component {
         `;    
     }
 
-    setEvent () {
+    setEvent(){
         const { deleteItem, toggleItem, allChk, updateItem, 
             dragStartItem, dragEndItem, dragEnterItem,
             dragLeaveItem, dropItem, isFilter } = this.$props;
         
         //삭제
-        this.addEvent ('click', '.del', function (e) {
+        this.addEvent('click', '.del', function (e) {
             deleteItem(Number(e.target.closest('[data-seq]').dataset.seq));
         });
 
         //체크
-        this.addEvent ('click', '.chk', function (e) {
+        this.addEvent('click', '.chk', function (e) {
             toggleItem(Number(e.target.closest('[data-seq]').dataset.seq));
         });
 
         //전체 체크
-        this.addEvent ('click', '.allChk', function (e) {
+        this.addEvent('click', '.allChk', function (e) {
             allChk(e.target);
         });
 
         //수정
-        this.addEvent ('dblclick', '.task label', function (e) {
+        this.addEvent('dblclick', '.task label', function (e) {
             const $updateInput = document.createElement("input");
             $updateInput.className = 'edit';
             $updateInput.value = e.target.textContent;
@@ -53,14 +53,22 @@ export default class Item extends Component {
             e.target.closest('li').className = 'editing';
             $updateInput.focus();
             
+            $updateInput.closest('li').draggable = false;
+
             $updateInput.addEventListener('blur', function (e) {
+                e.stopImmediatePropagation();
                 updateItem(Number(e.target.closest('[data-seq]').dataset.seq), $updateInput.value);
+                //console.log('blur - update !! ');
             }); 
             
-            $updateInput.addEventListener('keyup', (e) => {
-                if(e.keyCode === 13) updateItem(Number(e.target.closest('[data-seq]').dataset.seq), $updateInput.value);
+            /*
+            $updateInput.addEventListener('keyup', function (e) {
+                if(e.keyCode !== 13) return;
+                updateItem(Number(e.target.closest('[data-seq]').dataset.seq), $updateInput.value);
+                console.log('keyup - update !! ');
+                e.stopImmediatePropagation();
             });
-            
+            */
         });
 
         //드래그 작업
@@ -74,39 +82,39 @@ export default class Item extends Component {
         */
         //dragstart, dragEnd, dropItem, dragover, dragenter, dragleave
 
-        if( isFilter === 0 ){
-            this.addEvent ('dragstart', '.todo-list li', function (e) {
-                e.dataTransfer.effectAllowed = 'move';
-                e.dataTransfer.setData('data-seq', e.target.closest('[data-seq]').dataset.seq);
-    
-                dragStartItem (Number(e.target.closest('[data-seq]').dataset.seq));
-            });
-    
-            this.addEvent ('dragend', '.todo-list li', function (e) {
-                dragEndItem (Number(e.target.closest('[data-seq]').dataset.seq));
-            });
-    
-            this.addEvent ('dragover', '.todo-list li', function (e) {
-                e.stopPropagation();
-                e.preventDefault();
-                e.dataTransfer.dropEffect = 'move';
-            });
-    
-            this.addEvent ('dragenter', '.todo-list li', function (e) {
-                dragEnterItem (Number(e.target.closest('[data-seq]').dataset.seq));
-            });
-    
-            this.addEvent ('dragleave', '.todo-list li', function (e) {
-                e.stopPropagation();
-                e.preventDefault();
-                dragLeaveItem (Number(e.target.closest('[data-seq]').dataset.seq));
-            });
-    
-            this.addEvent('drop', '.todo-list li', function (e) {
-                //드래그 시작한 seq, 드랍 한 seq
-                dropItem (Number(e.dataTransfer.getData('data-seq')) ,Number(e.target.closest('[data-seq]').dataset.seq));
-            });
-        }
+        
+        this.addEvent('dragstart', '.todo-list li', function (e) {
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('data-seq', e.target.closest('[data-seq]').dataset.seq);
+
+            dragStartItem(Number(e.target.closest('[data-seq]').dataset.seq));
+        });
+
+        this.addEvent('dragend', '.todo-list li', function (e) {
+            dragEndItem(Number(e.target.closest('[data-seq]').dataset.seq));
+        });
+
+        this.addEvent('dragover', '.todo-list li', function (e) {
+            e.stopPropagation();
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+        });
+
+        this.addEvent('dragenter', '.todo-list li', function (e) {
+            dragEnterItem(Number(e.target.closest('[data-seq]').dataset.seq));
+        });
+
+        this.addEvent('dragleave', '.todo-list li', function (e) {
+            e.stopPropagation();
+            e.preventDefault();
+            dragLeaveItem(Number(e.target.closest('[data-seq]').dataset.seq));
+        });
+
+        this.addEvent('drop', '.todo-list li', function (e) {
+            //드래그 시작한 seq, 드랍 한 seq
+            dropItem(Number(e.dataTransfer.getData('data-seq')), Number(e.target.closest('[data-seq]').dataset.seq));
+        });
+        
 
     }
 }
