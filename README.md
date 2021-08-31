@@ -77,16 +77,19 @@
     - → LocalStorage 적용을 위한 컴포넌트화 연구 및 todo items가 없을때의 제어를 어디서 걸어줄지 연구
 - 1.0.1
     - 웹 컴포넌트 작업 (2)
-    - → LocalStorage 가져오기 (filter, items 저장시킬예정)
-    - blur 이벤트 오류, removeEvent 좀 더 연구
+    - → LocalStorage 가져오기
+    - blur 이벤트 오류 발생
     - Drag & Drop 기능 추가 예정
-    - 나머지 기본적인건 구현 완료 ( blur 이벤트 처리 빼고는 ... )
-    => 렌더링 이후에 또 수정 되는건 어디서 작업해야 하는지,,, 결국 원점으로 돌아간것 같은 느낌ㅠ
 - 1.0.2
     - Drag & Drop 작업 진행
     - Drop 요소 빼고 진행 완료 => Drop 하면 순서가 어떻게 될지, seq 가져오는 것 고민
-    - 가이드 엘리먼트 ( bottom 만 작업 함 )
-    - li요소 연구 필요
+    - 가이드 엘리먼트
+- 1.0.3
+    - 드래그 기능 추가 => 이에 따른 CSS 추가
+- 1.0.4
+    - 코드 정리 및 addEvent 에 대한 이해
+    - blur 이벤트, keyup 이벤트 에러 해결중
+    - isFilter 에 대한 상수 처리
 ---
 <br>
 <br>
